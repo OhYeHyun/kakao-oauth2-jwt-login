@@ -16,10 +16,26 @@
 <body>
 Join Page
 <hr>
-<form action="/joinProc" method="post" name="joinForm">
-    <input type="text" name="username" placeholder="username"/>
-    <input type="password" name="password" placeholder="password"/>
-    <input type="submit" value="join"/>
+<form th:action="@{/joinProc}" method="post" th:object="${joinDto}" name="joinForm">
+
+    <div>
+        <input type="text"
+               th:field="*{username}"
+               th:errorclass="field-error"
+               placeholder="아이디를 입력하세요."
+               autofocus/>
+        <div class="field-error" th:errors="*{username}"></div>
+    </div>
+
+    <div>
+        <input type="password"
+               th:field="*{password}"
+               th:errorclass="field-error"
+               placeholder="비밀번호를 입력하세요."/>
+        <div class="field-error" th:errors="*{password}"></div>
+    </div>
+
+    <button type="submit">회원가입</button>
 </form>
 </body>
 </html>
