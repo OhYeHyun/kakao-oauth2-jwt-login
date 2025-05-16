@@ -1,5 +1,6 @@
 package hello.kakao_oauth2_jwt_login.config;
 
+import hello.kakao_oauth2_jwt_login.jwt.JwtUtil;
 import hello.kakao_oauth2_jwt_login.jwt.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtUtil jwtUtil;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -50,7 +52,7 @@ public class SecurityConfig {
                 );
 
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
 //        http
 //                .formLogin((auth) -> auth.loginPage("/login")
