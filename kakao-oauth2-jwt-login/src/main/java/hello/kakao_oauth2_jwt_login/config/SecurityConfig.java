@@ -1,15 +1,24 @@
 package hello.kakao_oauth2_jwt_login.config;
 
+import hello.kakao_oauth2_jwt_login.jwt.LoginFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -17,7 +26,21 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        http
+                .csrf((auth) -> auth.disable());
+
+        http
+                .formLogin((auth) -> auth.disable());
+
+        http
+                .httpBasic((auth) -> auth.disable());
 
         http
                 .authorizeHttpRequests((auth) -> auth
@@ -27,19 +50,24 @@ public class SecurityConfig {
                 );
 
         http
-                .formLogin((auth) -> auth.loginPage("/login")
-                        .loginProcessingUrl("/loginProc")
-                        .permitAll()
-                );
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class);
+
+//        http
+//                .formLogin((auth) -> auth.loginPage("/login")
+//                        .loginProcessingUrl("/loginProc")
+//                        .permitAll()
+//                );
 
         http
-                .csrf((auth) -> auth.disable());
+                .sessionManagement((session) ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
 }
 
 /**
+ * [Spring Security]
  * 인가 설정 :
  *   - "/" 및 "/login" 등 경로는 모두에게 허용 (permitAll)
  *   - "/admin" 경로는 ADMIN 권한을 가진 사용자만 접근 가능
@@ -54,4 +82,13 @@ public class SecurityConfig {
  *
  * CSRF 보호 :
  *   - 기본적으로 로그인 할 때 CSRF 토큰이 필요하지만, 개발 환경에서는 csrf 을 비활성화
+ *
+ *  ------
+ * [JWT]
+ * disable
+ *   - csrf: JWT 에서는 stateless 로 관리하기 때문에 굳이 필요없음
+ *   - formLogin, httpBasic: JWT 방식으로 진행할 것이기 때문에 필요없음
+ *     formLogin 을 disable 했기 때문에, UsernamePasswordAuthenticationFilter 와 AuthenticationManager 를 구현해야 로그인 처리를 할 수 있다.
+ *
+ * STATELESS: JWT 를 통한 인가/인증을 위해 STATELESS 로 설정
  */

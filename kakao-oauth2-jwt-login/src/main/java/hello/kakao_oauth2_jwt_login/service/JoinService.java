@@ -21,7 +21,7 @@ public class JoinService {
         UserEntity user = new UserEntity();
         user.setUsername(joinDto.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(joinDto.getPassword()));
-        user.setRole("ROLE_USER");
+        user.setRole("ROLE_ADMIN");
 
         userRepository.save(user);
     }
@@ -44,7 +44,7 @@ public class JoinService {
         }
 
         if (username.toLowerCase().contains("admin")) {
-            throw new IllegalArgumentException("'admin'은 아이디로 사용할 수 없습니다.");
+//            throw new IllegalArgumentException("'admin'은 아이디로 사용할 수 없습니다.");
         }
     }
 
