@@ -6,6 +6,11 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login Page</title>
+    <style>
+        .social-login {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 Login Page
@@ -14,6 +19,9 @@ Login Page
     <input id="username" type="text" name="username" placeholder="id"/>
     <input id="password" type="password" name="password" placeholder="password"/>
     <input type="submit" value="login"/>
+    <div class="social-login">
+        <a href="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=05a53ca24e20f8eabbc525054ea30098&redirect_uri=http://localhost:8080/login/oauth2/code/kakao"><img src="/image/kakao_login_medium_narrow.png"/></a>
+    </div>
 </form>
 </body>
 </html>

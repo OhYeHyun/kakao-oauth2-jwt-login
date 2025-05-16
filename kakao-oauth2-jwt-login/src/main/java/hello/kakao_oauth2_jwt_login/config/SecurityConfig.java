@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -46,8 +47,11 @@ public class SecurityConfig {
                 .httpBasic((auth) -> auth.disable());
 
         http
+                .oauth2Login(Customizer.withDefaults());
+
+        http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/login", "/loginProc", "/join", "/joinProc").permitAll()
+                        .requestMatchers("/", "/oauth2/**", "/image/**", "/login", "/loginProc", "/join", "/joinProc").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
@@ -58,11 +62,14 @@ public class SecurityConfig {
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
-//        http
-//                .formLogin((auth) -> auth.loginPage("/login")
-//                        .loginProcessingUrl("/loginProc")
-//                        .permitAll()
-//                );
+        http
+                .formLogin((auth) -> auth.loginPage("/login")
+                        .loginProcessingUrl("/loginProc")
+                        .permitAll()
+                );
+
+        http
+                .oauth2Login((auth) -> auth.loginPage("/login"));
 
         http
                 .sessionManagement((session) ->
