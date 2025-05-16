@@ -1,5 +1,6 @@
 package hello.kakao_oauth2_jwt_login.config;
 
+import hello.kakao_oauth2_jwt_login.jwt.JwtFilter;
 import hello.kakao_oauth2_jwt_login.jwt.JwtUtil;
 import hello.kakao_oauth2_jwt_login.jwt.LoginFilter;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,9 @@ public class SecurityConfig {
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
+
+        http
+                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
 
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);

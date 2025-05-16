@@ -1,6 +1,7 @@
 package hello.kakao_oauth2_jwt_login.jwt;
 
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -44,4 +45,7 @@ public class JwtUtil {
 /**
  * application.properties 에 지정한 ${spring.jwt.secret} 값으로 secretKey 를 생성
  * Jwts.parser().verifyWith(secretKey) : 토큰이 우리 서버에서 생성되었는지, 우리 서버에서 생성된 키가 가진 키와 맞는지 확인
+ *
+ * .issuedAt(new Date(System.currentTimeMillis()))
+ * > 발급 시각, issuedAt)가 포함되어 있기 때문에, 매번 현재 시간을 기준으로 발급되면 내용이 달라지므로,각 요청마다 클라이언트가 보내야 한다.
  */
