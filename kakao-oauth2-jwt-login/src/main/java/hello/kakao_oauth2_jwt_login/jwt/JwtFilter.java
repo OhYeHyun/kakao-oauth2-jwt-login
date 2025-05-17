@@ -24,7 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
-        if (path.startsWith("/login") || path.startsWith("/oauth2") || path.startsWith("/join")) {
+        if (path.startsWith("/login") || path.startsWith("/oauth2") || path.startsWith("/join") || path.startsWith("/image")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -49,7 +49,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = authorization;
         if (jwtUtil.isExpired(token)) {
             log.info("token expired");
-            filterChain.doFilter(request, response);
+            response.sendRedirect("/login?error=expired");
             return;
         }
 

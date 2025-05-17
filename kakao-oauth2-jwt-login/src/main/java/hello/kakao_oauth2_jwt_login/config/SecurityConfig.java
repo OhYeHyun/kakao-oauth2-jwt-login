@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .formLogin((auth) -> auth.loginPage("/login")
                         .loginProcessingUrl("/loginProc")
                         .successHandler(customSuccessHandler)
+                        .failureUrl("/login?error=fail")
                         .permitAll()
                 );
 
