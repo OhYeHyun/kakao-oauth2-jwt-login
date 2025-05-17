@@ -1,14 +1,12 @@
 package hello.kakao_oauth2_jwt_login.config;
 
-import hello.kakao_oauth2_jwt_login.jwt.JwtFilter;
-import hello.kakao_oauth2_jwt_login.jwt.JwtUtil;
-import hello.kakao_oauth2_jwt_login.jwt.LoginFilter;
 import hello.kakao_oauth2_jwt_login.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -17,6 +15,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -29,11 +32,6 @@ public class SecurityConfig {
 
         http
                 .httpBasic((auth) -> auth.disable());
-
-        http
-                .oauth2Login((oauth2) -> oauth2
-                        .userInfoEndpoint((userInfoEndpointConfig) ->
-                                userInfoEndpointConfig.userService(customOAuth2UserService)));
 
         http
                 .authorizeHttpRequests((auth) -> auth
@@ -49,7 +47,10 @@ public class SecurityConfig {
                 );
 
         http
-                .oauth2Login((auth) -> auth.loginPage("/login"));
+                .oauth2Login((oauth2) -> oauth2
+                        .loginPage("/login")
+                        .userInfoEndpoint((userInfoEndpointConfig) ->
+                                userInfoEndpointConfig.userService(customOAuth2UserService)));
 
         return http.build();
     }
@@ -80,4 +81,12 @@ public class SecurityConfig {
  *     formLogin 을 disable 했기 때문에, UsernamePasswordAuthenticationFilter 와 AuthenticationManager 를 구현해야 로그인 처리를 할 수 있다.
  *
  * STATELESS: JWT 를 통한 인가/인증을 위해 STATELESS 로 설정
+ *
+ * ---
+ * [OAuth2 세션]
+ * userInfoEndpoint().userService(...)
+ * -  OAuth2 로그인 시 OAuth2 제공자(Kakao)에서 받은 유저 정보로부터 인증 객체를 만들도록 도와주는 서비스
+ *
+ * 시큐리티 로그인: UsernamePasswordAuthenticationToken 생성 시 DB에서 직접 유저 정보를 조회.
+ * OAuth2 로그인: 제공자에서 유저 정보 API로 조회한 데이터를 사용해서 조회
  */
