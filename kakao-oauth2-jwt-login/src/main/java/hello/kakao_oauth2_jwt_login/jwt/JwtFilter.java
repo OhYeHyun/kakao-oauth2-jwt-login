@@ -29,43 +29,47 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String authorization = null;
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("Authorization")) {
-                    authorization = cookie.getValue();
-                }
-            }
-        }
-
-        if (authorization == null) {
+        String token = extractTokenFromCookies(request.getCookies());
+        if (token == null) {
             log.info("token null");
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authorization;
         if (jwtUtil.isExpired(token)) {
             log.info("token expired");
             response.sendRedirect("/login?error=expired");
             return;
         }
 
-        UserEntity userEntity = new UserEntity();
-        userEntity.setNickname(jwtUtil.getNickname(token));
-        userEntity.setUsername(jwtUtil.getUsername(token));
-        userEntity.setRole(jwtUtil.getRole(token));
-        userEntity.setProvider(jwtUtil.getProvider(token));
-        userEntity.setProviderId(jwtUtil.getProviderId(token));
-
+        UserEntity userEntity = createUserEntityFromToken(token);
         PrincipalUser principalUser = new PrincipalUser(userEntity);
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(principalUser, null, principalUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
+    }
+
+    private String extractTokenFromCookies(Cookie[] cookies) {
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("Authorization")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    private UserEntity createUserEntityFromToken(String token) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setNickname(jwtUtil.getNickname(token));
+        userEntity.setUsername(jwtUtil.getUsername(token));
+        userEntity.setRole(jwtUtil.getRole(token));
+        userEntity.setProvider(jwtUtil.getProvider(token));
+        userEntity.setProviderId(jwtUtil.getProviderId(token));
+        return userEntity;
     }
 }
 

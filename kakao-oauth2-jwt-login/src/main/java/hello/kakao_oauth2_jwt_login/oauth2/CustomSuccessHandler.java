@@ -29,16 +29,19 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String username = principalUser.getName();
         String provider = principalUser.getProvider();
         String providerId = principalUser.getProviderId();
-
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority();
+        String role = getRoleFromAuthentication(authentication);
 
         String token = jwtUtil.createJwt(nickname, username, role, provider, providerId, 60 * 60 * 10L);
         response.addCookie(createCookie("Authorization", token));
 
         getRedirectStrategy().sendRedirect(request, response, "/");
+    }
+
+    private String getRoleFromAuthentication(Authentication authentication) {
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+        GrantedAuthority auth = iterator.next();
+        return auth.getAuthority();
     }
 
     private Cookie createCookie(String key, String value) {

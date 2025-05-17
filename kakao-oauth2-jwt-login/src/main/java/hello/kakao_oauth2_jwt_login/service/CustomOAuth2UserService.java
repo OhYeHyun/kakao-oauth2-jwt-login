@@ -20,39 +20,48 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        OAuth2Response oAuth2Response;
+        OAuth2Response oAuth2Response = extractOAuth2Response(registrationId, oAuth2User);
+        if (oAuth2Response == null) return null;
+
+        String username = buildUsername(oAuth2Response);
+        UserEntity userEntity = userRepository.findByUsername(username);
+
+        if (userEntity == null) {
+            userEntity = createUserEntityFromOAuth2Response(oAuth2Response);
+        } else {
+            updateUserEntity(userEntity, oAuth2Response);
+        }
+
+        return new PrincipalUser(userEntity);
+    }
+
+    private OAuth2Response extractOAuth2Response(String registrationId, OAuth2User oAuth2User) {
         if (registrationId.equals("kakao")) {
-            oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
-        } else {
-            return null;
+            return new KakaoResponse(oAuth2User.getAttributes());
         }
+        return null;
+    }
 
-        String nickname = oAuth2Response.getNickname();
-        String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
-        String provider = oAuth2Response.getProvider();
-        String providerId = oAuth2Response.getProviderId();
+    private UserEntity createUserEntityFromOAuth2Response(OAuth2Response oAuth2Response) {
+        UserEntity userEntity = new UserEntity();
 
-        UserEntity userData = userRepository.findByUsername(username);
+        userEntity.setNickname(oAuth2Response.getNickname());
+        userEntity.setUsername(buildUsername(oAuth2Response));
+        userEntity.setRole("ROLE_USER");
+        userEntity.setProvider(oAuth2Response.getProvider());
+        userEntity.setProviderId(oAuth2Response.getProviderId());
 
-        String role = "ROLE_USER";
-        if (userData == null) {
-            UserEntity userEntity = new UserEntity();
-            userEntity.setNickname(nickname);
-            userEntity.setUsername(username);
-            userEntity.setRole(role);
-            userEntity.setProvider(provider);
-            userEntity.setProviderId(providerId);
+        return userRepository.save(userEntity);
+    }
 
-            userRepository.save(userEntity);
+    private String buildUsername(OAuth2Response oAuth2Response) {
+        return oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
+    }
 
-            return new PrincipalUser(userEntity);
-        } else {
-            userData.setNickname(nickname);
-            userData.setProvider(provider);
-            userData.setProviderId(providerId);
-
-            return new PrincipalUser(userData);
-        }
+    private void updateUserEntity(UserEntity userEntity, OAuth2Response response) {
+        userEntity.setNickname(response.getNickname());
+        userEntity.setProvider(response.getProvider());
+        userEntity.setProviderId(response.getProviderId());
     }
 }
 
