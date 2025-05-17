@@ -9,5 +9,7 @@
 </head>
 <body>
 Main Page
+<hr>
+<p th:text="${nickname != null} ? ${nickname} + ' 님, 반갑습니다 😊' : 'Guest 님, 반갑습니다 😊'">Guest</p>
 </body>
 </html>
