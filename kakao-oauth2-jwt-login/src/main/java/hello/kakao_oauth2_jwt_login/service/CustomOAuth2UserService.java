@@ -3,6 +3,7 @@ package hello.kakao_oauth2_jwt_login.service;
 import hello.kakao_oauth2_jwt_login.dto.CustomOAuth2User;
 import hello.kakao_oauth2_jwt_login.dto.KakaoResponse;
 import hello.kakao_oauth2_jwt_login.dto.OAuth2Response;
+import hello.kakao_oauth2_jwt_login.dto.UserDto;
 import hello.kakao_oauth2_jwt_login.entity.UserEntity;
 import hello.kakao_oauth2_jwt_login.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,17 +37,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String role = "ROLE_USER";
         if (userData == null) {
             UserEntity userEntity = new UserEntity();
-            userEntity.setUsername(username);
             userEntity.setNickname(nickname);
+            userEntity.setUsername(username);
             userEntity.setRole(role);
 
             userRepository.save(userEntity);
-        } else {
-            role = userData.getRole();
-            userData.setNickname(nickname);
-        }
 
-        return new CustomOAuth2User(oAuth2Response, role);
+            UserDto userDto = new UserDto();
+            userDto.setNickname(nickname);
+            userDto.setUsername(username);
+            userDto.setRole(role);
+
+            return new CustomOAuth2User(userDto);
+        } else {
+            userData.setNickname(nickname);
+
+            UserDto userDto = new UserDto();
+            userDto.setNickname(nickname);
+            userDto.setUsername(username);
+            userDto.setRole(role);
+
+            return new CustomOAuth2User(userDto);
+        }
     }
 }
 
