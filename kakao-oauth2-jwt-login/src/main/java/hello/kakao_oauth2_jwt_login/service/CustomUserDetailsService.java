@@ -1,6 +1,6 @@
 package hello.kakao_oauth2_jwt_login.service;
 
-import hello.kakao_oauth2_jwt_login.dto.CustomUserDetails;
+import hello.kakao_oauth2_jwt_login.dto.PrincipalUser;
 import hello.kakao_oauth2_jwt_login.entity.UserEntity;
 import hello.kakao_oauth2_jwt_login.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserEntity userData = userRepository.findByUsername(username);
 
         if (userData != null) {
-            return new CustomUserDetails(userData);
+            return new PrincipalUser(userData);
         }
 
         throw new UsernameNotFoundException("User not found with username: " + username);

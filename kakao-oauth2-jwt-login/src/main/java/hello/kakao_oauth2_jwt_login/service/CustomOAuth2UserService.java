@@ -1,9 +1,6 @@
 package hello.kakao_oauth2_jwt_login.service;
 
-import hello.kakao_oauth2_jwt_login.dto.CustomOAuth2User;
-import hello.kakao_oauth2_jwt_login.dto.KakaoResponse;
-import hello.kakao_oauth2_jwt_login.dto.OAuth2Response;
-import hello.kakao_oauth2_jwt_login.dto.UserDto;
+import hello.kakao_oauth2_jwt_login.dto.*;
 import hello.kakao_oauth2_jwt_login.entity.UserEntity;
 import hello.kakao_oauth2_jwt_login.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +27,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return null;
         }
 
-        String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
         String nickname = oAuth2Response.getNickname();
+        String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
+        String provider = oAuth2Response.getProvider();
+        String providerId = oAuth2Response.getProviderId();
+
         UserEntity userData = userRepository.findByUsername(username);
 
         String role = "ROLE_USER";
@@ -40,24 +40,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userEntity.setNickname(nickname);
             userEntity.setUsername(username);
             userEntity.setRole(role);
+            userEntity.setProvider(provider);
+            userEntity.setProviderId(providerId);
 
             userRepository.save(userEntity);
 
-            UserDto userDto = new UserDto();
-            userDto.setNickname(nickname);
-            userDto.setUsername(username);
-            userDto.setRole(role);
-
-            return new CustomOAuth2User(userDto);
+            return new PrincipalUser(userEntity);
         } else {
             userData.setNickname(nickname);
+            userData.setProvider(provider);
+            userData.setProviderId(providerId);
 
-            UserDto userDto = new UserDto();
-            userDto.setNickname(nickname);
-            userDto.setUsername(username);
-            userDto.setRole(role);
-
-            return new CustomOAuth2User(userDto);
+            return new PrincipalUser(userData);
         }
     }
 }

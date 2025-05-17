@@ -23,14 +23,14 @@ Join Page
             <input type="text"
                    th:field="*{nickname}"
                    th:errorclass="field-error"
-                   placeholder="닉네임를 입력하세요."/>
+                   placeholder="닉네임를 입력하세요."
+                   autofocus/>
             <div class="field-error" th:errors="*{nickname}"></div>
         </div>
         <input type="text"
                th:field="*{username}"
                th:errorclass="field-error"
-               placeholder="아이디를 입력하세요."
-               autofocus/>
+               placeholder="아이디를 입력하세요."/>
         <div class="field-error" th:errors="*{username}"></div>
     </div>
 

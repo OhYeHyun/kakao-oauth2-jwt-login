@@ -19,4 +19,6 @@ public class UserEntity {
 
     private String password;
     private String role;
+    private String provider;
+    private String providerId;
 }

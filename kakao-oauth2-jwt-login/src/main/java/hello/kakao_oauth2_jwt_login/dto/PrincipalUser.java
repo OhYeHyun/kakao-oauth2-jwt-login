@@ -4,14 +4,21 @@ import hello.kakao_oauth2_jwt_login.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class PrincipalUser implements UserDetails, OAuth2User {
 
     private final UserEntity userEntity;
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return Map.of();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -30,7 +37,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return userEntity.getPassword();
+        return userEntity.getPassword() != null ? userEntity.getPassword() : "";
     }
 
     @Override
@@ -40,6 +47,20 @@ public class CustomUserDetails implements UserDetails {
 
     public String getNickname() {
         return userEntity.getNickname();
+    }
+
+    // OAuth2
+    @Override
+    public String getName() {
+        return getProvider() + " " + getProviderId();
+    }
+
+    public String getProvider() {
+        return userEntity.getProvider();
+    }
+
+    public String getProviderId() {
+        return userEntity.getProviderId();
     }
 
     @Override
