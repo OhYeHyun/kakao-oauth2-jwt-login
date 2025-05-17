@@ -5,6 +5,7 @@ import hello.kakao_oauth2_jwt_login.jwt.JwtUtil;
 import hello.kakao_oauth2_jwt_login.oauth2.CustomSuccessHandler;
 import hello.kakao_oauth2_jwt_login.service.CustomOAuth2UserService;
 import hello.kakao_oauth2_jwt_login.service.CustomUserDetailsService;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -71,6 +72,19 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler));
 
         http
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            Cookie cookie = new Cookie("Authorization", null);
+                            cookie.setMaxAge(0);
+                            cookie.setPath("/");
+                            response.addCookie(cookie);
+
+                            response.sendRedirect("/");
+                        })
+                );
+
+        http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -114,4 +128,9 @@ public class SecurityConfig {
  *
  * 시큐리티 로그인: UsernamePasswordAuthenticationToken 생성 시 DB에서 직접 유저 정보를 조회.
  * OAuth2 로그인: 제공자에서 유저 정보 API로 조회한 데이터를 사용해서 조회
+ *
+ * 로그아웃을 컨트롤러에서 하지 않는 이유
+ * 컨트롤러에서 /logout 요청을 처리한다고 하면:
+ * Security FilterChain이 먼저 가로채기 때문에 Controller에 도달하지 못한다.
+ * 로그아웃 처리를 직접 하려면 Spring Security의 기본 동작을 비활성화하거나 우회해야 하는데, 보안상 불리하고 코드가 복잡
  */

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -11,5 +11,20 @@
 Main Page
 <hr>
 <p th:text="${nickname != null} ? ${nickname} + ' 님, 반갑습니다 😊' : 'Guest 님, 반갑습니다 😊'">Guest</p>
+
+<div sec:authorize="isAuthenticated()">
+    <a th:href="@{/my}">
+        <button type="button">내 페이지 보러 가기</button>
+    </a>
+</div>
+
+<div sec:authorize="!isAuthenticated()">
+    <a th:href="@{/login}">
+        <button type="button">로그인 하러 가기</button>
+    </a>
+</div>
+<form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+    <button type="submit">로그아웃 하기</button>
+</form>
 </body>
 </html>
