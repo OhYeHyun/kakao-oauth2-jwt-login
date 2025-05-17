@@ -4,7 +4,6 @@ import hello.kakao_oauth2_jwt_login.dto.JoinDto;
 import hello.kakao_oauth2_jwt_login.entity.UserEntity;
 import hello.kakao_oauth2_jwt_login.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
