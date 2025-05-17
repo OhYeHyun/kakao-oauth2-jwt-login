@@ -64,17 +64,3 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         userEntity.setProviderId(response.getProviderId());
     }
 }
-
-/**
- * [사용자 카카오 로그인 클릭]
- *        ↓
- * [Spring Security가 Kakao에 요청 → 콜백 처리]
- *        ↓
- * [CustomOAuth2UserService.loadUser() 실행됨]
- *        ↓
- * [KakaoResponse로 파싱]
- *        ↓
- * [UserEntity 조회/생성 → DB 저장]
- *        ↓
- * [CustomOAuth2User 반환 → Security Context에 저장]
- */

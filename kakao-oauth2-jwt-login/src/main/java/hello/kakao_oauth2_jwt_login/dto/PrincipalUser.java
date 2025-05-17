@@ -83,8 +83,3 @@ public class PrincipalUser implements UserDetails, OAuth2User {
         return true;
     }
 }
-
-/**
- * 계정이 잠기지 않고 계속 사용하도록 임의로 true 로 세팅
- * 구현은 DB Table 의 만료 유무를 체크하는 필드를 추가하여 구현
- */
