@@ -19,6 +19,13 @@ Join Page
 <form th:action="@{/joinProc}" method="post" th:object="${joinDto}" name="joinForm">
 
     <div>
+        <div>
+            <input type="text"
+                   th:field="*{nickname}"
+                   th:errorclass="field-error"
+                   placeholder="닉네임를 입력하세요."/>
+            <div class="field-error" th:errors="*{nickname}"></div>
+        </div>
         <input type="text"
                th:field="*{username}"
                th:errorclass="field-error"
@@ -33,6 +40,7 @@ Join Page
                th:errorclass="field-error"
                placeholder="비밀번호를 입력하세요."/>
         <div class="field-error" th:errors="*{password}"></div>
+
     </div>
 
     <button type="submit">회원가입</button>

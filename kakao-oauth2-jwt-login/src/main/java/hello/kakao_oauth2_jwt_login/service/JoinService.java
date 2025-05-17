@@ -18,9 +18,10 @@ public class JoinService {
         validateDto(joinDto);
 
         UserEntity user = new UserEntity();
+        user.setNickname(joinDto.getNickname());
         user.setUsername(joinDto.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(joinDto.getPassword()));
-        user.setRole("ROLE_ADMIN");
+        user.setRole("ROLE_USER");
 
         userRepository.save(user);
     }
@@ -43,7 +44,11 @@ public class JoinService {
         }
 
         if (username.toLowerCase().contains("admin")) {
-//            throw new IllegalArgumentException("'admin'은 아이디로 사용할 수 없습니다.");
+            throw new IllegalArgumentException("'admin'은 아이디로 사용할 수 없습니다.");
+        }
+
+        if (username.toLowerCase().startsWith("kakao")) {
+            throw new IllegalArgumentException("사용할 수 없는 아이디입니다.");
         }
     }
 
